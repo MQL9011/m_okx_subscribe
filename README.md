@@ -50,15 +50,15 @@ cp .env.example .env
 
 配置项说明：
 
-| 环境变量           | 说明            | 示例                                                  |
-| ------------------ | --------------- | ----------------------------------------------------- |
-| OKX_API_KEY        | OKX API Key     | xxxxx                                                 |
-| OKX_SECRET_KEY     | OKX API Secret  | xxxxx                                                 |
-| OKX_PASSPHRASE     | OKX API 密码    | xxxxx                                                 |
-| OKX_SIMULATED      | 是否使用模拟盘  | false                                                 |
-| WECHAT_API_URL     | 微信消息API地址 | https://api.mccree.info/wxapi/wechat/message/template |
-| WECHAT_OPENID      | 微信用户OpenID  | o1j7B2KKt8NLt2bX66I6qEXYpPb8                          |
-| WECHAT_TEMPLATE_ID | 微信模板消息ID  | 3yV22yKxByPS6onC4kgUn7VRMi9JNXJL2XXX819N-8A           |
+| 环境变量           | 说明            | 示例  |
+| ------------------ | --------------- | ----- |
+| OKX_API_KEY        | OKX API Key     | xxxxx |
+| OKX_SECRET_KEY     | OKX API Secret  | xxxxx |
+| OKX_PASSPHRASE     | OKX API 密码    | xxxxx |
+| OKX_SIMULATED      | 是否使用模拟盘  | false |
+| WECHAT_API_URL     | 微信消息API地址 |       |
+| WECHAT_OPENID      | 微信用户OpenID  |       |
+| WECHAT_TEMPLATE_ID | 微信模板消息ID  |       |
 
 ### 获取 OKX API Key
 
