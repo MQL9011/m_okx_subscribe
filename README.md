@@ -9,14 +9,19 @@
 - 📱 自动将订单通知转发到微信
 - 🔄 断线自动重连机制
 - 💓 心跳保活机制
+- 📝 完整的日志记录（连接、认证、订单、通知）
 
 ## 项目结构
 
 ```
 src/
 ├── common/
-│   └── interfaces/
-│       └── okx-order.interface.ts  # OKX订单数据接口定义
+│   ├── interfaces/
+│   │   └── okx-order.interface.ts  # OKX订单数据接口定义
+│   └── logging/
+│       ├── logging.service.ts      # 日志服务
+│       ├── logging.controller.ts   # 日志API控制器
+│       └── logging.module.ts       # 日志模块
 ├── okx/
 │   ├── okx.module.ts               # OKX模块
 │   └── okx.service.ts              # OKX WebSocket服务
@@ -135,10 +140,34 @@ pm2 stop okx-subscribe
 
 ## API 端点
 
-| 方法 | 路径    | 说明     |
-| ---- | ------- | -------- |
-| GET  | /       | 服务状态 |
-| GET  | /health | 健康检查 |
+| 方法 | 路径        | 说明                       |
+| ---- | ----------- | -------------------------- |
+| GET  | /           | 服务状态                   |
+| GET  | /health     | 健康检查                   |
+| GET  | /logs       | 获取最近日志（?lines=100） |
+| GET  | /logs/path  | 获取日志文件路径           |
+| POST | /logs/clear | 清空日志                   |
+
+## 日志
+
+日志文件位于部署目录下的 `logs/okx.log`，最新日志显示在文件最前面。
+
+日志记录内容：
+- 🔗 **CONNECTION**: WebSocket 连接建立、断开、重连
+- 🔐 **AUTH**: 登录认证成功/失败
+- 📡 **SUBSCRIBE**: 频道订阅状态
+- 📦 **ORDER**: 订单更新详情
+- 📱 **NOTIFY**: 微信通知发送结果
+- ⚙️ **SYSTEM**: 系统启动/停止等
+
+查看日志：
+```bash
+# 通过 API 查看
+curl http://localhost:3000/logs
+
+# 直接查看文件
+cat logs/okx.log | head -100
+```
 
 ## 订单通知格式
 

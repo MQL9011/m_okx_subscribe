@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { OkxModule } from './okx/okx.module';
 import { WechatModule } from './wechat/wechat.module';
+import { LoggingModule } from './common/logging';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { WechatModule } from './wechat/wechat.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    LoggingModule,
     OkxModule,
     WechatModule,
   ],
