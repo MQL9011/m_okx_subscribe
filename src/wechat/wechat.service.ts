@@ -3,10 +3,11 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
 export interface WechatTemplateData {
-  first: { value: string; color?: string };
-  keyword1: { value: string; color?: string };
-  keyword2: { value: string; color?: string };
-  remark?: { value: string; color?: string };
+  keyword1: { value: string; color?: string }; // 交易时间
+  keyword2: { value: string; color?: string }; // 交易品种
+  keyword3: { value: string; color?: string }; // 交易方向
+  keyword4: { value: string; color?: string }; // 成交数量
+  keyword5: { value: string; color?: string }; // 订单状态
 }
 
 @Injectable()
@@ -54,18 +55,25 @@ export class WechatService {
 
   /**
    * 发送订单通知
+   * @param time 交易时间
+   * @param instId 交易品种
+   * @param side 交易方向
+   * @param size 成交数量
+   * @param state 订单状态
    */
   async sendOrderNotification(
-    title: string,
-    date: string,
-    content: string,
-    remark?: string,
+    time: string,
+    instId: string,
+    side: string,
+    size: string,
+    state: string,
   ): Promise<boolean> {
     return this.sendTemplateMessage({
-      first: { value: title, color: '#173177' },
-      keyword1: { value: date },
-      keyword2: { value: content },
-      remark: { value: remark || '点击查看详情' },
+      keyword1: { value: time },
+      keyword2: { value: instId },
+      keyword3: { value: side },
+      keyword4: { value: size },
+      keyword5: { value: state },
     });
   }
 }

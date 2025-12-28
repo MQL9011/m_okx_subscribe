@@ -14,7 +14,6 @@ import {
   OkxOrderData,
   ORDER_STATE_MAP,
   ORDER_SIDE_MAP,
-  INST_TYPE_MAP,
 } from '../common/interfaces/okx-order.interface';
 
 @Injectable()
@@ -297,18 +296,20 @@ export class OkxService implements OnModuleInit, OnModuleDestroy {
         pnl: order.pnl,
       });
 
-      // 格式化订单信息
-      const title = this.formatOrderTitle(order);
-      const date = this.formatDate(order.uTime);
-      const content = this.formatOrderContent(order);
-      const remark = this.formatOrderRemark(order);
+      // 格式化订单信息用于微信通知
+      const time = this.formatDate(order.uTime);
+      const instId = order.instId;
+      const side = ORDER_SIDE_MAP[order.side] || order.side;
+      const size = this.formatSize(order);
+      const state = ORDER_STATE_MAP[order.state] || order.state;
 
       // 发送微信通知
       const success = await this.wechatService.sendOrderNotification(
-        title,
-        date,
-        content,
-        remark,
+        time,
+        instId,
+        side,
+        size,
+        state,
       );
 
       // 记录通知结果
@@ -317,20 +318,13 @@ export class OkxService implements OnModuleInit, OnModuleDestroy {
         success,
         {
           ordId: order.ordId,
-          title,
-          content,
+          instId,
+          side,
+          size,
+          state,
         },
       );
     }
-  }
-
-  /**
-   * 格式化订单标题
-   */
-  private formatOrderTitle(order: OkxOrderData): string {
-    const side = ORDER_SIDE_MAP[order.side] || order.side;
-    const state = ORDER_STATE_MAP[order.state] || order.state;
-    return `【OKX订单通知】${side} ${order.instId} - ${state}`;
   }
 
   /**
@@ -349,54 +343,16 @@ export class OkxService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * 格式化订单内容
+   * 格式化成交数量（包含均价信息）
    */
-  private formatOrderContent(order: OkxOrderData): string {
-    const instType = INST_TYPE_MAP[order.instType] || order.instType;
-    const side = ORDER_SIDE_MAP[order.side] || order.side;
-    const parts: string[] = [];
+  private formatSize(order: OkxOrderData): string {
+    let result = order.sz;
 
-    parts.push(`类型: ${instType}`);
-    parts.push(`方向: ${side}`);
-    parts.push(`数量: ${order.sz}`);
-
-    if (order.px && order.px !== '0') {
-      parts.push(`价格: ${order.px}`);
+    // 如果有成交均价，附加上
+    if (order.avgPx && order.avgPx !== '0' && order.avgPx !== '') {
+      result += ` @ ${order.avgPx}`;
     }
 
-    if (order.avgPx && order.avgPx !== '0') {
-      parts.push(`均价: ${order.avgPx}`);
-    }
-
-    if (order.accFillSz && order.accFillSz !== '0') {
-      parts.push(`成交: ${order.accFillSz}`);
-    }
-
-    return parts.join(' | ');
-  }
-
-  /**
-   * 格式化订单备注
-   */
-  private formatOrderRemark(order: OkxOrderData): string {
-    const parts: string[] = [];
-
-    if (order.pnl && order.pnl !== '0') {
-      const pnl = parseFloat(order.pnl);
-      const pnlText = pnl >= 0 ? `+${order.pnl}` : order.pnl;
-      parts.push(`盈亏: ${pnlText}`);
-    }
-
-    if (order.fee && order.fee !== '0') {
-      parts.push(`手续费: ${order.fee} ${order.feeCcy}`);
-    }
-
-    if (order.lever && order.lever !== '0') {
-      parts.push(`杠杆: ${order.lever}x`);
-    }
-
-    parts.push(`订单ID: ${order.ordId}`);
-
-    return parts.join(' | ');
+    return result;
   }
 }
