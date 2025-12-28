@@ -38,7 +38,8 @@ export class WechatService {
         url: url || '',
       };
 
-      this.logger.log(`发送微信通知: ${JSON.stringify(payload)}`);
+      this.logger.log(`发送微信通知到: ${this.apiUrl}`);
+      this.logger.log(`请求数据: ${JSON.stringify(payload, null, 2)}`);
 
       const response = await axios.post(this.apiUrl, payload, {
         headers: { 'Content-Type': 'application/json' },
@@ -46,9 +47,17 @@ export class WechatService {
       });
 
       this.logger.log(`微信通知响应: ${JSON.stringify(response.data)}`);
-      return true;
-    } catch (error) {
-      this.logger.error(`发送微信通知失败: ${error.message}`);
+      const resData = response.data as { errcode?: number; success?: boolean };
+      return resData?.errcode === 0 || resData?.success !== false;
+    } catch (error: unknown) {
+      const err = error as Error & {
+        response?: { status: number; data: unknown };
+      };
+      this.logger.error(`发送微信通知失败: ${err.message}`);
+      if (err.response) {
+        this.logger.error(`响应状态: ${err.response.status}`);
+        this.logger.error(`响应数据: ${JSON.stringify(err.response.data)}`);
+      }
       return false;
     }
   }
